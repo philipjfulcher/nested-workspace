@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  pr-checks:
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.13.1"
+
+      - name: Install Deps
+        working-directory: ./nested
+        run: npm ci --legacy-peer-deps
+
+      - uses: nrwl/nx-set-shas@v4
+
+      - name: Nx Affected
+        working-directory: ./nested
+        run: npx nx affected -t lint build
